@@ -4,6 +4,13 @@
  * ExpList ==> 表达式列表 ==>  单个表达式  符合表达式
  */
 
+const Binop = {
+  Plus,
+  Minus,
+  Times,
+  Div,
+}
+
 const StmType = {
   compound: { type: 'stm', kind: 'compound' },
   assign: { type: 'stm', kind: 'assign' },
@@ -32,16 +39,16 @@ const ExpType = {
 
 // 表达式
 const Exp = {
-  Id: (id) => {
+  id: (id) => {
     return { ...StmType.id, id }
   },
-  Num: (num) => {
+  num: (num) => {
     return { ...StmType.num, num }
   },
-  Op: (left, oper, right) => {
+  op: (left, oper, right) => {
     return { ...StmType.op, left, oper, right }
   },
-  Eseq: (stm, exp) => {
+  eseq: (stm, exp) => {
     return { ...StmType.eseq, stm, exp }
   }
 }
@@ -53,10 +60,31 @@ const ExpListType = {
 
 // 表达式列表
 const ExpList = {
-  Pair: (head, tail) => {
+  pair: (head, tail) => {
     return { ...StmType.pair, head, tail }
   },
-  Last: (tail) => {
+  last: (tail) => {
     return { ...StmType.last, tail }
   }
 }
+
+// a := 5 + 3; b := (print(a, a + 1), 10 * a); print(b)
+
+let prog = Stm.compound(
+  Stm.assign(
+    'a',
+    Exp.Op(Exp.num(5), Binop.Plus, Exp.num(5))
+  ),
+  Stm.compound(
+    Stm.assign(
+      'b',
+      Exp.eseq(
+        Stm.print(ExpList.pair('a', ExpList.last(Exp.Op(Exp.id('a'), Binop.Minus, Exp.num(1))))),
+        Exp.op(Exp.num(10), Binop.Times, Exp.id('a'))
+      )
+    ),
+    Stm.print(
+      ExpList.last(Exp.id('b'))
+    )
+  )
+);
