@@ -5,10 +5,10 @@
  */
 
 const Binop = {
-  Plus,
-  Minus,
-  Times,
-  Div,
+  Plus: 'Plus',
+  Minus: 'Minus',
+  Times: 'Times',
+  Div: 'Div',
 }
 
 const StmType = {
