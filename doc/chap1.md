@@ -3,8 +3,7 @@
 > 2.Exp ==> 表达式 ==> Id(变量名) Num（数字常量） Op( 操作符+ - * /) Eseq 逗号表达式
 > 3.ExpList ==> 表达式列表 ==>  单个表达式  符合表达式
 
-```
-结构定义：
+```javascript
 const Binop = {
   Plus: 'Plus',
   Minus: 'Minus',
@@ -69,9 +68,8 @@ const ExpList = {
   }
 }
 ```
-
 > 实现： a := 5 + 3; b := (print(a, a + 1), 10 * a); print(b)
-```
+```javascript
 let prog = Stm.compound(
   Stm.assign(
     'a',
