@@ -73,13 +73,13 @@ const ExpList = {
 let prog = Stm.compound(
   Stm.assign(
     'a',
-    Exp.Op(Exp.num(5), Binop.Plus, Exp.num(5))
+    Exp.op(Exp.num(5), Binop.Plus, Exp.num(5))
   ),
   Stm.compound(
     Stm.assign(
       'b',
       Exp.eseq(
-        Stm.print(ExpList.pair('a', ExpList.last(Exp.Op(Exp.id('a'), Binop.Minus, Exp.num(1))))),
+        Stm.print(ExpList.pair('a', ExpList.last(Exp.op(Exp.id('a'), Binop.Minus, Exp.num(1))))),
         Exp.op(Exp.num(10), Binop.Times, Exp.id('a'))
       )
     ),
