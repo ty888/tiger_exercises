@@ -25,31 +25,31 @@ const Stm = {
   assign: (id, exp) => {
     return { ...StmType.assign, id, exp }
   },
-  print: (ExpList) => {
-    return { ...StmType.assign, ExpList }
+  print: (expList) => {
+    return { ...StmType.print, expList }
   }
 }
 
 const ExpType = {
   id: { type: 'exp', kind: 'id' },
-  num: { type: 'exp', kind: 'Num' },
-  op: { type: 'exp', kind: 'Op' },
-  eseq: { type: 'exp', kind: 'Eseq' }
+  num: { type: 'exp', kind: 'num' },
+  op: { type: 'exp', kind: 'op' },
+  eseq: { type: 'exp', kind: 'eseq' }
 }
 
 // 表达式
 const Exp = {
   id: (id) => {
-    return { ...StmType.id, id }
+    return { ...ExpType.id, id }
   },
   num: (num) => {
-    return { ...StmType.num, num }
+    return { ...ExpType.num, num }
   },
   op: (left, oper, right) => {
-    return { ...StmType.op, left, oper, right }
+    return { ...ExpType.op, left, oper, right }
   },
   eseq: (stm, exp) => {
-    return { ...StmType.eseq, stm, exp }
+    return { ...ExpType.eseq, stm, exp }
   }
 }
 
@@ -61,10 +61,10 @@ const ExpListType = {
 // 表达式列表
 const ExpList = {
   pair: (head, tail) => {
-    return { ...StmType.pair, head, tail }
+    return { ...ExpListType.pair, head, tail }
   },
-  last: (tail) => {
-    return { ...StmType.last, tail }
+  last: (exp) => {
+    return { ...ExpListType.last, exp }
   }
 }
 
@@ -72,14 +72,14 @@ const ExpList = {
 
 let prog = Stm.compound(
   Stm.assign(
-    'a',
+    Exp.id('a'),
     Exp.op(Exp.num(5), Binop.Plus, Exp.num(5))
   ),
   Stm.compound(
     Stm.assign(
-      'b',
+      Exp.id('b'),
       Exp.eseq(
-        Stm.print(ExpList.pair('a', ExpList.last(Exp.op(Exp.id('a'), Binop.Minus, Exp.num(1))))),
+        Stm.print(ExpList.pair(Exp.id('a'), ExpList.last(Exp.op(Exp.id('a'), Binop.Minus, Exp.num(1))))),
         Exp.op(Exp.num(10), Binop.Times, Exp.id('a'))
       )
     ),
@@ -88,3 +88,45 @@ let prog = Stm.compound(
     )
   )
 );
+
+
+/**
+ * 一个函数传入一个表达式 求表达式中print参数的最大值
+ * 一个函数 传入一个表达式列表ExpList， 求这个表达式列表中print参数的最大值
+ * 一个函数传入一个语句 stm 求这个stm中print的参数最大值
+ */
+
+const maxargs = (stm) => {
+  if (stm.kind === "compound") {
+    return Math.max(maxargs(stm.stm1), maxargs(stm.stm2));
+  }
+  if (stm.kind === "assign") {
+    return max_exp_args(stm.exp);
+  }
+  if (stm.kind === "print") {
+    return count_exp_list(stm.expList);
+  }
+}
+
+
+const max_exp_args = (exp) => {
+  if(exp.kind === 'op') {
+    return Math.max(max_exp_args(exp.left), max_exp_args(exp.right));
+  }
+  if(exp.kind === 'eseq') {
+    return Math.max(maxargs(exp.stm), max_exp_args(exp.exp));
+  }
+  return 0
+}
+
+
+const count_exp_list = (explist) => {
+  if(explist.kind === 'pair') {
+    return Math.max(max_exp_args(explist.head), (1 + count_exp_list(explist.tail)));
+  }
+  if(explist.kind === 'last') {
+    return 1 + max_exp_args(explist.exp)
+  }
+}
+
+console.log(`maxargs is ${maxargs(prog)}`);
